@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>MetaGlances</title>
+		<link rel="stylesheet" href="//code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+		<link rel="stylesheet" href="style.css" />
+		<script src="//code.jquery.com/jquery-1.8.2.min.js"></script>
+		<script src="//code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+		<script src="script.js"></script>
+		<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="apple-touch-icon-72x72-precomposed.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="apple-touch-icon-114x114-precomposed.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="apple-touch-icon-144x144-precomposed.png" />
+	</head>
+	
+	<body>
+		<!-- Home -->
+		<div data-role="page" data-theme="a" id="home">
+			<div data-role="header" data-position="fixed">
+				<h3>MetaGlances</h3>
+				<a data-role="button" data-transition="slide" href="#serverform" data-icon="plus" data-iconpos="left" class="ui-btn-left">Add</a>
+				<a data-role="button" data-transition="slide" href="#about" data-icon="info" data-iconpos="notext" data-theme="b" class="ui-btn-right"></a>
+			</div>
+			<div data-role="content">
+				<ul data-role="listview" data-divider-theme="a" data-inset="true" id="serverList">
+					<li data-role="list-divider" role="heading">Server List</li>
+					<li>- empty -</li>
+				</ul>
+			</div>
+			<!-- Not Supported Popup -->
+			<div data-role="popup" data-overlay-theme="a" id="popupNotSupported">
+				<p>This is a completely basic popup, no options set.<p>
+			</div>
+		</div>
+		<!-- ServerDetails -->
+		<div data-role="page" data-theme="a" id="serverdetails">
+			<div data-role="header" data-position="fixed">
+				<h3>Server Details</h3>
+				<a data-role="button" data-rel="back" href="#home" data-icon="arrow-l" data-iconpos="left" class="ui-btn-left">Back</a>
+				<a data-role="button"  data-rel="dialog" data-transition="pop" href="#ConfirmDeleteDialog" data-icon="delete" data-iconpos="left" class="ui-btn-right" data-theme="f">Delete</a>
+			</div>
+			<div data-role="content">
+				<div data-role="collapsible-set">
+					<div data-role="collapsible" data-collapsed="false">
+						<h3>Information</h3>
+						<div style="text-align: center;" id="infosLoader"><img src="images/ajax-loader.gif"></div>
+						<div class="ui-grid-a" id="serverInfos">
+						</div>
+					</div>
+					<div data-role="collapsible" data-collapsed="true">
+						<h3>Status</h3>
+						<div class="ui-grid-a">
+							<div class="ui-block-a">CPU</div>
+							<div class="ui-block-b">125%</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Popup -->
+			<div data-role="popup" data-overlay-theme="a" id="popupDetails">
+				<p>Server not responding !<p>
+			</div>
+		</div>
+		<!-- ConfirmDeleteDialog -->
+		<div data-role="page" data-theme="a" id="ConfirmDeleteDialog">
+			<div data-role="content">
+				<p>Do you really want to remove this server ?</p>
+				<a href="" data-theme="f" data-role="button" id="serverDelete">Yes, I'm sure</a>
+				<a href="#serverdetails" data-role="button" id="serverDelete">No, thanks</a>
+			</div>
+		</div>
+		<!-- ServerForm -->
+		<div data-role="page" data-theme="a" id="serverform">
+			<div data-role="header" data-position="fixed">
+				<h3>Add New Server</h3>
+				<a data-role="button" data-rel="back" href="#home" data-icon="arrow-l" data-iconpos="left" class="ui-btn-left">Back</a>
+				<a data-role="button" href="" data-icon="check" data-iconpos="left" class="ui-btn-right" data-theme="g" id="formSave">Save</a>
+			</div>
+			<div data-role="content">
+				<div data-role="fieldcontain">
+					<fieldset data-role="controlgroup" data-mini="true">
+						<label for="inputipv4">IPv4 Address</label>
+						<input name="ipv4" id="inputipv4" placeholder="0.0.0.0" value="" type="text">
+					</fieldset>
+				</div>
+				<div data-role="fieldcontain">
+					<fieldset data-role="controlgroup" data-mini="true">
+						<label for="inputport">Port number</label>
+						<input name="port" id="inputport" placeholder="" value="61209" type="text">
+					</fieldset>
+				</div>
+				<div data-role="fieldcontain">
+					<fieldset data-role="controlgroup" data-mini="true">
+						<label for="inputdesc">Description</label>
+						<input name="desc" id="inputdesc" placeholder="(optional)" value="" type="text">
+					</fieldset>
+				</div>
+			</div>
+			<!-- Popup -->
+			<div data-role="popup" data-overlay-theme="a" id="popupForm">
+				<p>This is a completely basic popup, no options set.<p>
+			</div>
+		</div>
+		<!-- About -->
+		<div data-role="page" data-theme="a" id="about">
+			<div data-role="header" data-position="fixed">
+				<h3>About this App</h3>
+				<a data-role="button" data-rel="back" href="#home" data-icon="arrow-l" data-iconpos="left" class="ui-btn-left">Back</a>
+			</div>
+			<div data-role="content">
+				<div>
+					<p><img src="images/logo.png" style="float:left; margin:0 10px 0 0;" /><b>MetaGlances</b> is an application wrapper of <b>Glances</b>, a CLI curses based monitoring tool for GNU/Linux and BSD OS.</p>
+					<p>Glances uses the PsUtil library to get information from your system. It is developed by <a href="//www.nicolargo.com">Nicolas Hennion (aka Nicolargo)</a> in Python.</p>
+					<p style="font-size: small;">Check <a href="//github.com/nicolargo/glances">github.com/nicolargo/glances</a> for more details.</p>
+					<p><b>MetaGlances</b> is developed by <a href="//spin0us.free.fr">Laurent Spinelli (aka Spin0us)</a>, using jQuery Mobile Framework and some php stuff. It stores server configuration in the <code>localStorage</code> of the browser (not available in private browsering mode).</p>
+					<h2>License</h2>
+					<p>Copyright &copy; 2012 Laurent Spinelli (aka Spin0us)</p>
+					<p><code>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</code></p>
+					<p><code>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.</code></p>
+					<p><code>You should have received a copy of the GNU General Public License along with this program. If not, see <a href="//www.gnu.org/licenses/">www.gnu.org/licenses/</a>.</code></p>
+					<h2>ChangeLog</h2>
+					<p>
+						<dl>
+							<dt>Build 1 RC <span style="font-size: small;">(15 Nov. 2012)</span><dt>
+						</dl>
+					</p>
+				</div>
+			</div>
+		</div>
+		<script>
+function UCFirst(string)
+{
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+var build = "1";
+var selectedServer;
+var servers = null;
+var isPopupVisible = false; // Hack to prevent popupafterclose + $.mobile.changePage bug
+$('#home').bind('pageshow',function(event){
+	selectedServer = null;
+	// Load Storage datas
+	try {
+		// Reinit localStorage.servers for lower build
+		if(typeof(localStorage.build)==="undefined" || localStorage.build < build){
+			localStorage.build = build;
+			localStorage.removeItem("servers");
+		}
+		// Retrieve localStorage.servers
+		if(typeof(localStorage.servers)==="undefined"){
+			localStorage.servers = JSON.stringify([]);
+		}
+		servers = JSON.parse(localStorage.servers);
+		if(servers.length){
+			$('ul#serverList').empty().append('<li data-role="list-divider" role="heading">Server List</li>');
+			$.each(servers, function(i,item){
+				$('ul#serverList').append('<li><a href="#serverdetails" data-transition="slide" id="srv-'+i+'">'+item.desc+'</a></li>');
+			});
+			$('ul#serverList > li > a').bind('click', function(event, ui) {
+				selectedServer = $(this).attr('id').split('-')[1];
+			});
+			$('ul#serverList').listview('refresh');
+		}
+	} catch(err) {
+		$('#popupNotSupported').html("<p>Sorry! No web storage support...</p>").popup("open");
+	}
+});
+$('#serverdetails').bind('pagebeforeshow',function(event){
+	$('#infosLoader').show();
+	$('#serverInfos').html('').trigger('expand');
+	if(!servers || !selectedServer) {
+		console.log('Bad servers or selectedServer');
+		console.log(servers);
+		console.log(selectedServer);
+		$.mobile.changePage($("#home"));
+	}
+	else {
+		var srv = servers[selectedServer];
+		$.ajax({
+			url: 'serverRequest.php',
+			data: 'ipv4='+srv.ipv4+'&port='+srv.port,
+			type: 'post',
+			contentType: "application/x-www-form-urlencoded",
+			success : function(response, status, jqXHR) {
+				console.log(JSON.parse(response));
+				$('#infosLoader').hide();
+				var obj = JSON.parse(response);
+				$.each(obj.host, function(i,item){
+					var title = UCFirst(i.replace('_',' '));
+					$('#serverInfos').append('<div class="ui-block-a">'+title+'</div><div class="ui-block-b">'+item+'</div>');
+				});
+			},
+			error : function (xhr, ajaxOptions, thrownError){
+				isPopupVisible = true;
+				$('#infosLoader').hide();
+				$('#popupDetails').popup("open").bind({
+					popupafterclose: function(event, ui) {
+						if(isPopupVisible) {
+							isPopupVisible = false;
+							console.log('closing');
+							setTimeout('$.mobile.changePage($("#home"))',100);
+						}
+					}
+				});
+			} 
+		}); 
+	}
+});
+$('#serverDelete').bind('click', function(event, ui) {
+	if(selectedServer) {
+		servers.splice(selectedServer,1);
+		localStorage.servers = JSON.stringify(servers);
+	}
+	$.mobile.changePage($("#home"));
+});
+$('#serverform').bind('pagebeforeshow',function(event){
+	// Reinit input values
+	$('input[name="ipv4"]').val('');
+	$('input[name="desc"]').val('');
+});
+$('#formSave').bind('click', function(event, ui) {
+	// Validation patterns
+	var ipv4Pattern = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}?(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+	var portPattern = /^[0-9]{2,5}$/;
+	// Retrieve input values
+	var ipv4_val = $('input[name="ipv4"]').val();
+	var port_val = $('input[name="port"]').val();
+	var desc_val = $('input[name="desc"]').val();
+	if(desc_val == '') desc_val = ipv4_val;
+	// Test values with patterns
+	if(ipv4Pattern.test(ipv4_val) && portPattern.test(port_val)){
+		// Check if server not already in collection
+		var alreadyExists = false;
+		$.each(servers, function(i,item){
+			if(item.ipv4 == ipv4_val) alreadyExists = true;
+		});
+		// Store the new server
+		if(!alreadyExists){
+			servers.push({ipv4:ipv4_val,port:port_val,desc:desc_val});
+			servers.sort(function(a,b) {return (a.desc > b.desc) ? 1 : ((b.desc > a.desc) ? -1 : 0);});
+			localStorage.servers = JSON.stringify(servers);
+			// Go back to main view
+			$.mobile.changePage($("#home"), { transition: "flip"} );
+		}
+		else {
+			$('#popupForm').html("<p>Server already exists</p>").popup("open");
+		}
+	}
+	else {
+		$('#popupForm').html("<p>Invalid format !</p>").popup("open");
+	}
+});
+		</script>
+	</body>
+
+</html>
