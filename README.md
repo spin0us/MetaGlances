@@ -10,7 +10,7 @@ Glances uses the PsUtil library to get information from your system. It is devel
 
 Check [github.com/nicolargo/glances](http://github.com/nicolargo/glances) for more details.
 
-MetaGlances is developed by [Laurent Spinelli (aka Spin0us)](http://spin0us.free.fr), using jQuery Mobile Framework and some php stuff. It stores server configuration in the localStorage of the browser (not available in private browsering mode).
+MetaGlances is developed by [Laurent Spinelli (aka Spin0us)](http://spin0us.free.fr), using jQuery Mobile Framework and some php stuff. It stores server configuration in the `localStorage` of the browser (not available in private browsering mode).
 
 ## License
 
