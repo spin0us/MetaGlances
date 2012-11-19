@@ -5,6 +5,8 @@
 		<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Expires" content="-1" />
 		<link rel="apple-touch-icon" href="apple-touch-icon.png" />
 		<link rel="apple-touch-icon" sizes="72x72" href="apple-touch-icon-72x72-precomposed.png" />
 		<link rel="apple-touch-icon" sizes="114x114" href="apple-touch-icon-114x114-precomposed.png" />
@@ -26,7 +28,7 @@
 	
 	<body>
 		<!-- Splash -->
-		<div data-role="page" data-theme="a" id="splash"> 
+<!--		<div data-role="page" data-theme="a" id="splash"> 
 			<div style="text-align:center; margin-top:50px;">
 				<img src="images/logo.png" alt="splash" />
 			</div>
@@ -35,9 +37,10 @@
 		<div data-role="page" data-theme="a" id="home">
 			<div data-role="header" data-position="fixed">
 				<h3>MetaGlances</h3>
-				<a data-role="button" href="#serverform" data-icon="plus" data-iconpos="left" class="ui-btn-left">Add</a>
+				<a data-role="button" href="#serverform" data-icon="plus" data-iconpos="left" class="ui-btn-right">Add</a>
 			</div>
 			<div data-role="content">
+				<p id="user" style="font-size: small;"></p>
 				<ul data-role="listview" data-divider-theme="a" data-inset="true" id="serverList">
 					<li data-role="list-divider" role="heading">Server List</li>
 					<li>- empty -</li>
@@ -62,7 +65,8 @@
 			<div data-role="header" data-position="fixed">
 				<h3>Server Details</h3>
 				<a data-role="button" data-rel="back" href="#home" data-icon="arrow-l" data-iconpos="left" class="ui-btn-left">Back</a>
-				<a data-role="button" data-rel="dialog" href="#ConfirmDeleteDialog" data-icon="delete" data-iconpos="left" class="ui-btn-right" data-theme="f">Delete</a>
+<!--				<a data-role="button" data-rel="dialog" href="#ConfirmDeleteDialog" data-icon="delete" data-iconpos="left" class="ui-btn-right" data-theme="f">Delete</a>-->
+				<a data-role="button" data-rel="dialog" href="#ConfirmDeleteDialog" data-icon="delete" data-iconpos="notext" class="ui-btn-right" data-theme="f">Delete</a>
 			</div>
 			<div data-role="content" id="serverData">
 			</div>
@@ -103,7 +107,7 @@
 			<div data-role="content">
 				<p>Do you really want to remove this server ?</p>
 				<a href="" data-theme="f" data-role="button" id="serverDelete">Yes, I'm sure</a>
-				<a href="#serverdetails" data-role="button">No, thanks</a>
+				<a href="#serverdetails" data-rel="back" data-role="button">No, thanks</a>
 			</div>
 		</div>
 		<!-- ServerForm -->
@@ -165,7 +169,7 @@
 					<p style="font-size: small;">In order to store/restore your config on the cloud, you need to specify an email address and a password.</p>
 					<fieldset>
 						<input type="email" name="email" id="fldMail" value="" placeholder="Email address" />
-						<input type="password" name="password" id="fldPass" value="" placeholder="Passowrd" />
+						<input type="password" name="password" id="fldPass" value="" placeholder="Password" />
 						<a href="" data-role="button" data-theme="b" id="btnRegister">Register for the cloud</a>
 					</fieldset>
 				</div>

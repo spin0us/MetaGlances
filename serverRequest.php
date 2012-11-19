@@ -6,6 +6,8 @@
  * Author       : spin0us (github_[at]_spin0us_[dot]_net)
  * CreationDate : 15:45 16/11/2012
  ******************************************************************/
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 
 define('CACHE_FILE_TTL', 2); // in minute(s)
 define('CACHE_DIRECTORY', './cache/data/'); // server cache directory
@@ -44,8 +46,8 @@ if( (empty($_POST['ipv4']) && empty($_POST['fqdn'])) || empty($_POST['port']) ) 
 // Clean cached old files
 $files = scandir(CACHE_DIRECTORY);
 foreach($files as $file) {
-	if($file != '.' && $file != '..' && (time() - filemtime(CACHE_DIRECTORY.$file)) < (CACHE_FILE_TTL * 60)) {
-		@unlink(CACHE_DIRECTORY.$file);
+	if($file != '.' && $file != '..' && (time() - filemtime(CACHE_DIRECTORY.$file)) > (CACHE_FILE_TTL * 60)) {
+		unlink(CACHE_DIRECTORY.$file);
 	}
 }
 
@@ -73,10 +75,16 @@ if(!file_exists(CACHE_DIRECTORY.$serverFileName))
 	$json = json_decode($xml->params->param->value->string);
 
 	// Add glances version in output
-	$json->host->glances_version = (string)$version;
+	$json->host->glances = (string)$version;
+	
+	$json->lastupdate = date("d M y H:i:s");
 	
 	// Store in cache
 	file_put_contents(CACHE_DIRECTORY.$serverFileName,json_encode($json));
 }
 
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT" );
+header("Last-Modified: " . gmdate("D, d M Y H:i:s" ) . " GMT" );
+header("Cache-Control: no-cache, must-revalidate" );
+header("Pragma: no-cache" );
 echo file_get_contents(CACHE_DIRECTORY.$serverFileName);

@@ -555,4 +555,7 @@
     background-image: -moz-linear-gradient(top, #006000, #00bf00);
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #006000), color-stop(1, #00bf00));
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#006000', EndColorStr='#00bf00')"; }
-	
+
+critical { color: red; }
+warning { color: magenta; }
+careful { color: cyan; }

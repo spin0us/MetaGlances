@@ -13,17 +13,20 @@ var formatOutput = {
 };
 var UCFirst = function(string) { return string.charAt(0).toUpperCase() + string.slice(1); };
 var round = function(fval,dec) { return dec > 0 ? (Math.round(fval * 10 * dec) / (10 * dec)) : Math.round(fval); };
-var refreshPage = function() {
-  $.mobile.changePage(
-    window.location.href,
-    {
-      allowSamePageTransition : true,
-      transition              : 'none',
-      showLoadMsg             : false,
-      reloadPage              : true
-    }
-  );
+var getHtmlTag = function(val,care,warn,crit) {
+	return {
+		tag: (val > crit ? 'critical' : (val > warn ? 'warning' : (val > care ? 'careful' : 'span'))),
+		level: (val > crit ? 3 : (val > warn ? 2 : (val > care ? 1 : 0)))
+	};
 };
+var bytesToSize = function(bytes, dec) {
+    var sizes = ['Bytes', 'K', 'M', 'G', 'T'];
+    if (bytes == 0) return 'n/a';
+    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+    return round(bytes / Math.pow(1024, i), dec) + sizes[i];
+};
+
+$.ajaxSetup({ cache: false });
 
 // Splash
 function hideSplash() { console.log('hideSplash'); $.mobile.changePage("#home", "fade"); }
@@ -45,6 +48,13 @@ $('#home').bind('pageshow',function(event){
 		// Retrieve localStorage.servers
 		if(typeof(localStorage.servers)==="undefined"){
 			localStorage.servers = JSON.stringify([]);
+		}
+		if(typeof(localStorage.config)!=="undefined") {
+			var user = JSON.parse(localStorage.config);
+			$('#user').show().html('Logged as : <b>'+user.mail+'</b>');
+		}
+		else {
+			$('#user').hide();
 		}
 		servers = JSON.parse(localStorage.servers);
 		if(servers.length){
@@ -78,8 +88,9 @@ $('#serverdetails').bind('pagebeforeshow',function(event, page){
 		var srv = servers[selectedServer];
 		if(page.prevPage.attr('id') == "home") {
 			$('#serverData').html('<div style="text-align: center;"><img src="images/ajax-loader.gif"></div>');
+			var cacheVar = new Date().getTime();
 			$.ajax({
-				url: 'serverRequest.php',
+				url: 'serverRequest.php?'+cacheVar,
 				data: 'fqdn='+srv.fqdn+'&ipv4='+srv.ipv4+'&port='+srv.port,
 				type: 'post',
 				contentType: "application/x-www-form-urlencoded",
@@ -201,8 +212,9 @@ $('#signout').click(function(){
 });
 $('#btnRestore').click(function(){
 	var user = JSON.parse(localStorage.config);
+	var cacheVar = new Date().getTime();
 	$.ajax({
-		url: 'config.php',
+		url: 'config.php?'+cacheVar,
 		data: 'mail='+user.mail+'&pass='+user.pass,
 		type: 'post',
 		contentType: "application/x-www-form-urlencoded",
@@ -219,8 +231,9 @@ $('#btnRestore').click(function(){
 });
 $('#btnStore').click(function(){
 	var user = JSON.parse(localStorage.config);
+	var cacheVar = new Date().getTime();
 	$.ajax({
-		url: 'config.php',
+		url: 'config.php?'+cacheVar,
 		data: 'mail='+user.mail+'&pass='+user.pass+'&conf='+localStorage.servers,
 		type: 'post',
 		contentType: "application/x-www-form-urlencoded",
@@ -237,28 +250,40 @@ $('#btnStore').click(function(){
 var loadLinuxTemplate = function(obj) {
 	var esd = $('#serverData');
 	var content;
-
+	
 	// Information
 	content = '';
 	$.each(obj.host, function(i,item){
 		var title = UCFirst(i.replace('_',' '));
 		content += '<li>'+title+' <p class="ui-li-aside">'+item+'</p></li>';
 	});
-	esd.append('<h3>Information</h3><ul data-role="listview" data-inset="true">'+content+'</ul>');
+	esd.append('<div data-role="collapsible"><h3>Information</h3><ul data-role="listview" data-inset="true">'+content+'</ul></div>');
 
 	// Usage
 	content = '';
-	content += '<li><a href="#componentdetails" onClick="compclk=\'cpu\'">CPU <p class="ui-li-aside">'+round(obj.cpu.idle,1)+'%</p></a></li>';
-	content += '<li>RAM <p class="ui-li-aside">'+obj.mem.percent+'%</p></li>';
-	content += '<li>SWAP <p class="ui-li-aside">'+obj.memswap.percent+'%</p></li>';
-	esd.append('<h3>Usage</h3><ul data-role="listview" data-inset="true">'+content+'</ul>');
+	// Cpu
+	htmlTag = getHtmlTag(100 - obj.cpu.idle,50,70,90);
+	highTag = htmlTag;
+	content += '<li><a href="#componentdetails" onClick="compclk=\'cpu\'"><'+htmlTag.tag+'>CPU <p class="ui-li-aside">'+round(100 - obj.cpu.idle,1)+'%</p></'+htmlTag.tag+'></a></li>';
+	// Ram
+	htmlTag = getHtmlTag(obj.mem.percent,50,70,90);
+	highTag = htmlTag.level > highTag.level ? htmlTag : highTag;
+	content += '<li><a href="#componentdetails" onClick="compclk=\'ram\'"><'+htmlTag.tag+'>RAM <p class="ui-li-aside">'+obj.mem.percent+'%</p></'+htmlTag.tag+'></a></li>';
+	// Swap
+	htmlTag = getHtmlTag(obj.memswap.percent,50,70,90);
+	highTag = htmlTag.level > highTag.level ? htmlTag : highTag;
+	content += '<li><'+htmlTag.tag+'>SWAP <p class="ui-li-aside">'+obj.memswap.percent+'%</p></'+htmlTag.tag+'></li>';
+	esd.append('<div data-role="collapsible"><h3><'+highTag.tag+'>Usage</'+highTag.tag+'></h3><ul data-role="listview" data-inset="true">'+content+'</ul></div>');
 
 	// Load Average
 	content = '';
 	content += '<li>1 minute <p class="ui-li-aside">'+obj.load.min1+'</p></li>';
 	content += '<li>5 minutes <p class="ui-li-aside">'+obj.load.min5+'</p></li>';
 	content += '<li>15 minutes <p class="ui-li-aside">'+obj.load.min15+'</p></li>';
-	esd.append('<h3>Load Average</h3><ul data-role="listview" data-inset="true">'+content+'</ul>');
+	esd.append('<div data-role="collapsible"><h3>Load Average</h3><ul data-role="listview" data-inset="true">'+content+'</ul></div>');
+
+	// Lastupdate
+	esd.append('<p style="text-align:right;font-size: small;">Last update: '+obj.lastupdate+'</p>');
 
 	esd.trigger('create');
 };
@@ -267,12 +292,28 @@ var loadLinuxCpuTemplate = function(elm) {
 	if(!lobj) return;
 	$.each(lobj.percpu, function(i, cpu){
 		content = '';
-		content += '<li>CPU <p class="ui-li-aside">'+round(cpu.idle,1)+'%</p></li>';
-		content += '<li>User <p class="ui-li-aside">'+round(cpu.user,1)+'%</p></li>';
-		content += '<li>Kernel <p class="ui-li-aside">'+round(cpu.kernel,1)+'%</p></li>';
-		content += '<li>Nice <p class="ui-li-aside">'+round(cpu.nice,1)+'%</p></li>';
-		elm.append('<h3>CPU #'+i+'</h3><ul data-role="listview" data-inset="true">'+content+'</ul>');
+		htmlTag = getHtmlTag(100 - cpu.idle,50,70,90);
+		content += '<li><'+htmlTag.tag+'>CPU <p class="ui-li-aside">'+round(100 - cpu.idle,1)+'%</p></'+htmlTag.tag+'></li>';
+		htmlTag = getHtmlTag(cpu.user,50,70,90);
+		content += '<li><'+htmlTag.tag+'>User <p class="ui-li-aside">'+round(cpu.user,1)+'%</p></'+htmlTag.tag+'></li>';
+		htmlTag = getHtmlTag(cpu.kernel,50,70,90);
+		content += '<li><'+htmlTag.tag+'>Kernel <p class="ui-li-aside">'+round(cpu.kernel,1)+'%</p></'+htmlTag.tag+'></li>';
+		htmlTag = getHtmlTag(cpu.nice,50,70,90);
+		content += '<li><'+htmlTag.tag+'>Nice <p class="ui-li-aside">'+round(cpu.nice,1)+'%</p></'+htmlTag.tag+'></li>';
+		elm.append('<ul data-role="listview" data-inset="true" data-divider-theme="a"><li data-role="list-divider">CPU #'+i+'</li>'+content+'</ul>');
 	});
 	
+	elm.trigger('create');
+};
+
+var loadLinuxRamTemplate = function(elm) {
+	if(!lobj) return;
+	var mem = lobj.mem;
+	content = '';
+	content += '<li>Total <p class="ui-li-aside">'+bytesToSize(mem.total,1)+'</p></li>';
+	content += '<li>Used <p class="ui-li-aside">'+bytesToSize(mem.used,1)+' ('+bytesToSize(mem.used - mem.cache,0)+')</p></li>';
+	content += '<li>Free <p class="ui-li-aside">'+bytesToSize(mem.free,1)+' ('+bytesToSize(mem.free + mem.cache,0)+')</p></li>';
+	elm.append('<ul data-role="listview" data-inset="true" data-divider-theme="a"><li data-role="list-divider">Mem <p class="ui-li-aside">'+mem.percent+'%</p></li>'+content+'</ul>');
+
 	elm.trigger('create');
 };
