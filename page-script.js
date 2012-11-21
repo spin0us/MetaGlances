@@ -1,35 +1,18 @@
-var build = "2";
+var build = "3";
 var selectedServer, lobj, compclk;
 var servers = null;
 
-var formatOutput = {
-	idle: {
-		title: "used",
-		value: function(a) { var value = Math.round((100 - a) * 10) / 10; return {disp:value+'%',val:value};},
-		careful:50,
-		warning:70,
-		critical:90,
-		},
-};
 var UCFirst = function(string) { return string.charAt(0).toUpperCase() + string.slice(1); };
 var round = function(fval,dec) { return dec > 0 ? (Math.round(fval * 10 * dec) / (10 * dec)) : Math.round(fval); };
-var getHtmlTag = function(val,care,warn,crit) {
-	return {
-		tag: (val > crit ? 'critical' : (val > warn ? 'warning' : (val > care ? 'careful' : 'span'))),
-		level: (val > crit ? 3 : (val > warn ? 2 : (val > care ? 1 : 0)))
-	};
-};
-var bytesToSize = function(bytes, dec) {
-    var sizes = ['Bytes', 'K', 'M', 'G', 'T'];
-    if (bytes == 0) return 'n/a';
-    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-    return round(bytes / Math.pow(1024, i), dec) + sizes[i];
-};
+var getHtmlTag = function(val,care,warn,crit) { return {tag: (val > crit ? 'critical' : (val > warn ? 'warning' : (val > care ? 'careful' : 'span'))), level: (val > crit ? 3 : (val > warn ? 2 : (val > care ? 1 : 0))) }; };
+var bytesToSize = function(bytes, dec) { var sizes = ['Bytes', 'K', 'M', 'G', 'T']; if (bytes == 0) return '0'; var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024))); return round(bytes / Math.pow(1024, i), dec) + sizes[i]; };
+var bitsToSize = function(bits, dec) { var sizes = ['b', 'Kb', 'Mb', 'Gb', 'Tb']; if (bits == 0) return '0'; var i = parseInt(Math.floor(Math.log(bits) / Math.log(1000))); return round(bits / Math.pow(1000, i), dec) + sizes[i]; };
+var displayPopup = function(selector, message) { $('#'+selector+' > p#msg').html(message); $('#'+selector).popup("open"); };
 
 $.ajaxSetup({ cache: false });
 
 // Splash
-function hideSplash() { console.log('hideSplash'); $.mobile.changePage("#home", "fade"); }
+function hideSplash() { $.mobile.changePage("#home", "fade"); }
 $('#splash').bind('pageshow',function(event){
 	setTimeout(hideSplash, 2000);
 });
@@ -40,10 +23,9 @@ $('#home').bind('pageshow',function(event){
 	lobj = null;
 	// Load Storage datas
 	try {
-		// Reinit localStorage.servers for lower build
+		// Build change
 		if(typeof(localStorage.build)==="undefined" || localStorage.build < build){
 			localStorage.build = build;
-			// localStorage.removeItem("servers");
 		}
 		// Retrieve localStorage.servers
 		if(typeof(localStorage.servers)==="undefined"){
@@ -64,7 +46,6 @@ $('#home').bind('pageshow',function(event){
 			});
 			$('ul#serverList > li > a').bind('click', function(event, ui) {
 				selectedServer = $(this).attr('id').split('-')[1];
-				console.log("selectedServer: "+selectedServer);
 			});
 			$('ul#serverList').listview('refresh');
 		}
@@ -73,21 +54,20 @@ $('#home').bind('pageshow',function(event){
 			$('ul#serverList').listview('refresh');
 		}
 	} catch(err) {
-		$('#popupNotSupported').html("<p>Sorry! No web storage support...</p>").popup("open");
+		displayPopup('popupNotSupported', 'Sorry! No web storage support...');
 	}
 });
 
 // ServerDetails
 $('#serverdetails').bind('pagebeforeshow',function(event, page){
-	console.log(page.prevPage.attr('id'));
 	if(!servers || !selectedServer) {
-		console.log('#serverdetails > pagebeforeshow');
 		$.mobile.changePage($("#home"));
 	}
 	else {
 		var srv = servers[selectedServer];
+		$('#serverName').html(srv.desc);
 		if(page.prevPage.attr('id') == "home") {
-			$('#serverData').html('<div style="text-align: center;"><img src="images/ajax-loader.gif"></div>');
+			$('#serverData').html('<div style="text-align: center;"><img src="images/ajax-loader.gif" style="margin-top:50px" /><p>Loading data ...</p></div>');
 			var cacheVar = new Date().getTime();
 			$.ajax({
 				url: 'serverRequest.php?'+cacheVar,
@@ -103,7 +83,7 @@ $('#serverdetails').bind('pagebeforeshow',function(event, page){
 				},
 				error : function (xhr, ajaxOptions, thrownError){
 					$('#serverData').html('');
-					$('#popupDetails').popup("open").bind();
+					displayPopup('popupDetails', 'Server not responding !');
 				} 
 			});
 		}
@@ -114,15 +94,12 @@ $('#serverDelete').bind('click', function(event, ui) {
 		servers.splice(selectedServer,1);
 		localStorage.servers = JSON.stringify(servers);
 	}
-	console.log('#serverDelete > click');
 	$.mobile.changePage($("#home"));
 });
 
 // ComponentDetails
 $('#componentdetails').bind('pagebeforeshow',function(event, page){
-	console.log('Request for : ' + compclk);
 	if(!lobj || typeof(compclk) === "undefined") {
-		console.log('#componentdetails > pagebeforeshow');
 		$.mobile.changePage($("#home"));
 	}
 	else {
@@ -136,7 +113,6 @@ $('#componentdetails').bind('pagebeforeshow',function(event, page){
 // ServerForm
 $('#serverform').bind('pagebeforeshow',function(event){
 	if(!servers) {
-		console.log('#serverform > pagebeforeshow');
 		$.mobile.changePage($("#home"));
 	}
 	// Reinit input values
@@ -169,15 +145,14 @@ $('#formSave').bind('click', function(event, ui) {
 			servers.sort(function(a,b) {return (a.desc > b.desc) ? 1 : ((b.desc > a.desc) ? -1 : 0);});
 			localStorage.servers = JSON.stringify(servers);
 			// Go back to main view
-			console.log('#formSave > click');
 			$.mobile.changePage($("#home"), { transition: "flip"} );
 		}
 		else {
-			$('#popupForm').html("<p>Server already exists</p>").popup("open");
+			displayPopup('popupForm', 'Server already exists');
 		}
 	}
 	else {
-		$('#popupForm').html("<p>Invalid format !</p>").popup("open");
+		displayPopup('popupForm', 'Invalid format !');
 	}
 });
 
@@ -219,13 +194,12 @@ $('#btnRestore').click(function(){
 		type: 'post',
 		contentType: "application/x-www-form-urlencoded",
 		success : function(response, status, jqXHR) {
-			console.log(status + ' ' + response);
 			localStorage.servers = response;
 			servers = JSON.parse(localStorage.servers);
-			$('#popupCloud').html("<p>Restore completed ...</p>").popup("open");
+			displayPopup('popupCloud', 'Restore completed ...');
 		},
 		error : function (xhr, ajaxOptions, thrownError){
-			$('#popupCloud').html("<p>Restoration failed !</p>").popup("open");
+			displayPopup('popupCloud', 'Restoration failed !');
 		} 
 	});
 });
@@ -238,10 +212,10 @@ $('#btnStore').click(function(){
 		type: 'post',
 		contentType: "application/x-www-form-urlencoded",
 		success : function(response, status, jqXHR) {
-			$('#popupCloud').html("<p>Backup completed ...</p>").popup("open");
+			displayPopup('popupCloud', 'Backup completed ...');
 		},
 		error : function (xhr, ajaxOptions, thrownError){
-			$('#popupCloud').html("<p>Backup failed !</p>").popup("open");
+			displayPopup('popupCloud', 'Backup failed !');
 		} 
 	});
 });
@@ -249,7 +223,7 @@ $('#btnStore').click(function(){
 // Data display template
 var loadLinuxTemplate = function(obj) {
 	var esd = $('#serverData');
-	var content;
+	var content = '';
 	
 	// Information
 	content = '';
@@ -257,7 +231,7 @@ var loadLinuxTemplate = function(obj) {
 		var title = UCFirst(i.replace('_',' '));
 		content += '<li>'+title+' <p class="ui-li-aside">'+item+'</p></li>';
 	});
-	esd.append('<div data-role="collapsible"><h3>Information</h3><ul data-role="listview" data-inset="true">'+content+'</ul></div>');
+	esd.append('<div data-role="collapsible" id="diskio"><h3>Informations</h3><ul data-role="listview" data-inset="true">'+content+'</ul></div>');
 
 	// Usage
 	content = '';
@@ -272,19 +246,54 @@ var loadLinuxTemplate = function(obj) {
 	// Swap
 	htmlTag = getHtmlTag(obj.memswap.percent,50,70,90);
 	highTag = htmlTag.level > highTag.level ? htmlTag : highTag;
-	content += '<li><'+htmlTag.tag+'>SWAP <p class="ui-li-aside">'+obj.memswap.percent+'%</p></'+htmlTag.tag+'></li>';
-	esd.append('<div data-role="collapsible"><h3><'+highTag.tag+'>Usage</'+highTag.tag+'></h3><ul data-role="listview" data-inset="true">'+content+'</ul></div>');
+	content += '<li><a href="#componentdetails" onClick="compclk=\'swap\'"><'+htmlTag.tag+'>SWAP <p class="ui-li-aside">'+obj.memswap.percent+'%</p></'+htmlTag.tag+'></a></li>';
+	esd.append('<p>Usage</p><ul data-role="listview" data-inset="true">'+content+'</ul>');
 
-	// Load Average
+	// Load
 	content = '';
 	content += '<li>1 minute <p class="ui-li-aside">'+obj.load.min1+'</p></li>';
-	content += '<li>5 minutes <p class="ui-li-aside">'+obj.load.min5+'</p></li>';
-	content += '<li>15 minutes <p class="ui-li-aside">'+obj.load.min15+'</p></li>';
-	esd.append('<div data-role="collapsible"><h3>Load Average</h3><ul data-role="listview" data-inset="true">'+content+'</ul></div>');
+	htmlTag = getHtmlTag(obj.load.min5,0.7*obj.core_number,1*obj.core_number,5*obj.core_number);
+	content += '<li><'+htmlTag.tag+'>5 minutes <p class="ui-li-aside">'+obj.load.min5+'</p></'+htmlTag.tag+'></li>';
+	htmlTag = getHtmlTag(obj.load.min15,0.7*obj.core_number,1*obj.core_number,5*obj.core_number);
+	highTag = htmlTag.level > highTag.level ? htmlTag : highTag;
+	content += '<li><'+htmlTag.tag+'>15 minutes <p class="ui-li-aside">'+obj.load.min15+'</p></'+htmlTag.tag+'></li>';
+	esd.append('<p>Load <span class="ui-h3-aside">'+obj.core_number+'-Core</span></p><ul data-role="listview" data-inset="true">'+content+'</ul>');
 
+	// Network
+	content = '';
+	$.each(obj.network, function(i,item){
+		content += '<li>'+item.interface_name+' <p class="ui-li-aside ui-li-aside-fwidth">'+bitsToSize(item.rx,1)+'</p><p class="ui-li-aside ui-li-aside-fwidth">'+bitsToSize(item.tx,1)+'</p></li>';
+	});
+	esd.append('<div data-role="collapsible" id="network"><h3>Network <span class="ui-li-aside-fwidth">Tx/s</span><span class="ui-li-aside-fwidth">Rx/s</span></h3><ul data-role="listview" data-inset="true">'+content+'</ul></div>');
+	$('#network').bind( "collapse", function(event, ui) { $(this).find('span.ui-li-aside-fwidth').hide(); });
+	$('#network').bind( "expand", function(event, ui) { $(this).find('span.ui-li-aside-fwidth').show(); });
+	
+	// Disk I/O
+	content = '';
+	$.each(obj.diskio, function(i,item){
+		content += '<li>'+item.disk_name+' <p class="ui-li-aside ui-li-aside-fwidth">'+bytesToSize(item.read_bytes,1)+'</p><p class="ui-li-aside ui-li-aside-fwidth">'+bytesToSize(item.write_bytes,1)+'</p></li>';
+	});
+	esd.append('<div data-role="collapsible" id="diskio"><h3>Disk I/O <span class="ui-li-aside-fwidth">Out/s</span><span class="ui-li-aside-fwidth">In/s</span></h3><ul data-role="listview" data-inset="true">'+content+'</ul></div>');
+	$('#diskio').bind( "collapse", function(event, ui) { $(this).find('span.ui-li-aside-fwidth').hide(); });
+	$('#diskio').bind( "expand", function(event, ui) { $(this).find('span.ui-li-aside-fwidth').show(); });
+	
+	// Filesystem
+	content = '';
+	highTag = null;
+	$.each(obj.fs, function(i,item){
+		htmlTag = getHtmlTag(obj.fs.size * 100 - obj.fs.used,50,70,90);
+		if(!highTag) highTag = htmlTag;
+		highTag = htmlTag.level > highTag.level ? htmlTag : highTag;
+		content += '<li><'+htmlTag.tag+'>'+item.mnt_point+' <p class="ui-li-aside ui-li-aside-fwidth">'+bytesToSize(item.size,1)+'</p><p class="ui-li-aside ui-li-aside-fwidth">'+bytesToSize(item.used,1)+'</'+htmlTag.tag+'></p></li>';
+	});
+	esd.append('<div data-role="collapsible" id="fsys"><h3><'+highTag.tag+'>Filesystem</'+highTag.tag+'> <span class="ui-li-aside-fwidth">Used</span><span class="ui-li-aside-fwidth">Total</span></h3><ul data-role="listview" data-inset="true">'+content+'</ul></div>');
+	$('#fsys').bind( "collapse", function(event, ui) { $(this).find('span.ui-li-aside-fwidth').hide(); });
+	$('#fsys').bind( "expand", function(event, ui) { $(this).find('span.ui-li-aside-fwidth').show(); });
+	
 	// Lastupdate
-	esd.append('<p style="text-align:right;font-size: small;">Last update: '+obj.lastupdate+'</p>');
+	esd.append('<p style="text-align:right;font-size: small;">Last updated: '+obj.lastupdate+'</p>');
 
+	$('span.ui-li-aside-fwidth').hide();
 	esd.trigger('create');
 };
 
@@ -292,15 +301,14 @@ var loadLinuxCpuTemplate = function(elm) {
 	if(!lobj) return;
 	$.each(lobj.percpu, function(i, cpu){
 		content = '';
-		htmlTag = getHtmlTag(100 - cpu.idle,50,70,90);
-		content += '<li><'+htmlTag.tag+'>CPU <p class="ui-li-aside">'+round(100 - cpu.idle,1)+'%</p></'+htmlTag.tag+'></li>';
 		htmlTag = getHtmlTag(cpu.user,50,70,90);
 		content += '<li><'+htmlTag.tag+'>User <p class="ui-li-aside">'+round(cpu.user,1)+'%</p></'+htmlTag.tag+'></li>';
 		htmlTag = getHtmlTag(cpu.kernel,50,70,90);
 		content += '<li><'+htmlTag.tag+'>Kernel <p class="ui-li-aside">'+round(cpu.kernel,1)+'%</p></'+htmlTag.tag+'></li>';
 		htmlTag = getHtmlTag(cpu.nice,50,70,90);
 		content += '<li><'+htmlTag.tag+'>Nice <p class="ui-li-aside">'+round(cpu.nice,1)+'%</p></'+htmlTag.tag+'></li>';
-		elm.append('<ul data-role="listview" data-inset="true" data-divider-theme="a"><li data-role="list-divider">CPU #'+i+'</li>'+content+'</ul>');
+		htmlTag = getHtmlTag(100 - cpu.idle,50,70,90);
+		elm.append('<ul data-role="listview" data-inset="true" data-divider-theme="a"><li data-role="list-divider"><'+htmlTag.tag+'>CPU #'+i+' <p class="ui-li-aside">'+round(100 - cpu.idle,1)+'%</p></'+htmlTag.tag+'></li>'+content+'</ul>');
 	});
 	
 	elm.trigger('create');
@@ -314,6 +322,18 @@ var loadLinuxRamTemplate = function(elm) {
 	content += '<li>Used <p class="ui-li-aside">'+bytesToSize(mem.used,1)+' ('+bytesToSize(mem.used - mem.cache,0)+')</p></li>';
 	content += '<li>Free <p class="ui-li-aside">'+bytesToSize(mem.free,1)+' ('+bytesToSize(mem.free + mem.cache,0)+')</p></li>';
 	elm.append('<ul data-role="listview" data-inset="true" data-divider-theme="a"><li data-role="list-divider">Mem <p class="ui-li-aside">'+mem.percent+'%</p></li>'+content+'</ul>');
+
+	elm.trigger('create');
+};
+
+var loadLinuxSwapTemplate = function(elm) {
+	if(!lobj) return;
+	var mem = lobj.memswap;
+	content = '';
+	content += '<li>Total <p class="ui-li-aside">'+bytesToSize(mem.total,1)+'</p></li>';
+	content += '<li>Used <p class="ui-li-aside">'+bytesToSize(mem.used,0)+'</p></li>';
+	content += '<li>Free <p class="ui-li-aside">'+bytesToSize(mem.free,0)+'</p></li>';
+	elm.append('<ul data-role="listview" data-inset="true" data-divider-theme="a"><li data-role="list-divider">Swap <p class="ui-li-aside">'+mem.percent+'%</p></li>'+content+'</ul>');
 
 	elm.trigger('create');
 };

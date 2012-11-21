@@ -14,6 +14,7 @@
 		<title>MetaGlances</title>
 		<link rel="stylesheet" href="//code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
 		<link rel="stylesheet" href="style.css" />
+		<link rel="stylesheet" href="jqm-icon-pack-2.0-original.css" />
 		<script src="//code.jquery.com/jquery-1.8.2.min.js"></script>
 		<script src="//code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
 		<script src="script.js"></script>
@@ -55,20 +56,22 @@
 					</ul>
 				</div>
 			</div>
-			<!-- Not Supported Popup -->
-			<div data-role="popup" data-overlay-theme="a" id="popupNotSupported">
-				<p>This is a completely basic popup, no options set.<p>
+			<!-- Popup -->
+			<div data-role="popup" data-overlay-theme="a" class="ui-content" id="popupNotSupported">
+				<a href="#" data-rel="back" data-role="button" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+				<p id="msg"><p>
 			</div>
 		</div>
 		<!-- ServerDetails -->
 		<div data-role="page" data-theme="a" id="serverdetails">
 			<div data-role="header" data-position="fixed">
-				<h3>Server Details</h3>
-				<a data-role="button" data-rel="back" href="#home" data-icon="arrow-l" data-iconpos="left" class="ui-btn-left">Back</a>
+				<h3><span id="serverName">Server Details</span></h3>
+				<a data-role="button" data-rel="back" href="#home" data-icon="arrow-l" data-iconpos="left" class="ui-btn-left">Servers</a>
 <!--				<a data-role="button" data-rel="dialog" href="#ConfirmDeleteDialog" data-icon="delete" data-iconpos="left" class="ui-btn-right" data-theme="f">Delete</a>-->
 				<a data-role="button" data-rel="dialog" href="#ConfirmDeleteDialog" data-icon="delete" data-iconpos="notext" class="ui-btn-right" data-theme="f">Delete</a>
 			</div>
-			<div data-role="content" id="serverData">
+			<div data-role="content">
+				<div id="serverData"></div>
 			</div>
 			<div data-role="footer" data-id="globalFooter" data-position="fixed" class="nav-glyphish-example">
 				<div data-role="navbar" class="nav-glyphish-example">
@@ -80,15 +83,16 @@
 				</div>
 			</div>
 			<!-- Popup -->
-			<div data-role="popup" data-overlay-theme="a" id="popupDetails">
-				<p>Server not responding !<p>
+			<div data-role="popup" data-overlay-theme="a" class="ui-content" id="popupDetails">
+				<a href="#" data-rel="back" data-role="button" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+				<p id="msg"><p>
 			</div>
 		</div>
 		<!-- ComponentDetails -->
 		<div data-role="page" data-theme="a" id="componentdetails">
 			<div data-role="header" data-position="fixed">
 				<h3>Details</h3>
-				<a data-role="button" data-rel="back" href="#ServerDetails" data-icon="arrow-l" data-iconpos="left" class="ui-btn-left">Back</a>
+				<a data-role="button" data-rel="back" href="#ServerDetails" data-icon="arrow-l" data-iconpos="left" class="ui-btn-left">Details</a>
 			</div>
 			<div data-role="content" id="componentData">
 			</div>
@@ -153,15 +157,17 @@
 				</div>
 			</div>
 			<!-- Popup -->
-			<div data-role="popup" data-overlay-theme="a" id="popupForm">
-				<p>This is a completely basic popup, no options set.<p>
+			<div data-role="popup" data-overlay-theme="a" class="ui-content" id="popupForm">
+				<a href="#" data-rel="back" data-role="button" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+				<p id="msg"><p>
 			</div>
 		</div>
 		<!-- Cloud -->
 		<div data-role="page" data-theme="a" id="cloud">
 			<div data-role="header" data-position="fixed">
 				<h3>Store on Cloud</h3>
-				<a data-role="button" href="" data-icon="minus" data-iconpos="left" class="ui-btn-right" data-theme="f" id="signout">Signout</a>
+<!--				<a data-role="button" href="" data-icon="power" data-iconpos="left" class="ui-btn-right" data-theme="f" id="signout">Signout</a>-->
+				<a data-role="button" href="" data-icon="power" data-iconpos="notext" class="ui-btn-right" data-theme="f" id="signout">Signout</a>
 			</div>
 			<div data-role="content">
 				<p style="font-size: small;">This is useful in the recovery scenario when you want to get your config back after the failure or if you want to use the same config on another device.</p>
@@ -190,8 +196,9 @@
 				</div>
 			</div>
 			<!-- Popup -->
-			<div data-role="popup" data-overlay-theme="a" id="popupCloud">
-				<p>Server not responding !<p>
+			<div data-role="popup" data-overlay-theme="a" class="ui-content" id="popupCloud">
+				<a href="#" data-rel="back" data-role="button" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+				<p id="msg"><p>
 			</div>
 		</div>
 		<!-- About -->
@@ -202,6 +209,12 @@
 					<p>Glances uses the PsUtil library to get information from your system. It is developed by <a href="//www.nicolargo.com">Nicolas Hennion (aka Nicolargo)</a> in Python.</p>
 					<p style="font-size: small;">Check <a href="//github.com/nicolargo/glances">github.com/nicolargo/glances</a> for more details.</p>
 					<p><b>MetaGlances</b> is developed by <a href="//spin0us.free.fr">Laurent Spinelli (aka Spin0us)</a>, using jQuery Mobile Framework and some php stuff. It stores server configuration in the <code>localStorage</code> of the browser (not available in private browsering mode).</p>
+					<h4>Importants stats are colored</h4>
+					<ul>
+						<li><careful>BLUE</careful>: stat counter is "CAREFUL"</li>
+						<li><warning>MAGENTA</warning>: stat counter is "WARNING"</li>
+						<li><critical>RED</critical>: stat counter is "CRITICAL"</li>
+					</ul>
 					<h2>License</h2>
 					<p>Copyright &copy; 2012 Laurent Spinelli (aka Spin0us)</p>
 					<p><code>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</code></p>
@@ -209,6 +222,11 @@
 					<p><code>You should have received a copy of the GNU General Public License along with this program. If not, see <a href="//www.gnu.org/licenses/">www.gnu.org/licenses/</a>.</code></p>
 					<h2>ChangeLog</h2>
 					<p>
+						<dl>
+							<dt>Build 3 <span style="font-size: small;">(21 Nov. 2012)</span><dt>
+							<dd>* fix some bug</dd>
+							<dd>* add server details</dd>
+						</dl>
 						<dl>
 							<dt>Build 2 <span style="font-size: small;">(16 Nov. 2012)</span><dt>
 							<dd>* add FQDN support</dd>

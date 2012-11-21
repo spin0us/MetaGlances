@@ -559,3 +559,7 @@
 critical { color: red; }
 warning { color: magenta; }
 careful { color: cyan; }
+
+.ui-h3-aside { float:right;font-weight:normal; }
+.ui-li-aside-fwidth { width:60px; text-align:right; float:right; }
+span.ui-li-aside-fwidth { padding-right:5px;font-weight:normal;font-size:small; }
