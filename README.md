@@ -15,9 +15,13 @@ MetaGlances is developed by [Laurent Spinelli (aka Spin0us)](http://spin0us.free
 ## ScreenShots
 
 ![screenshot](https://github.com/spin0us/MetaGlances/raw/master/doc/screenshot-01.png)
+
 ![screenshot](https://github.com/spin0us/MetaGlances/raw/master/doc/screenshot-02.png)
+
 ![screenshot](https://github.com/spin0us/MetaGlances/raw/master/doc/screenshot-03.png)
+
 ![screenshot](https://github.com/spin0us/MetaGlances/raw/master/doc/screenshot-04.png)
+
 ![screenshot](https://github.com/spin0us/MetaGlances/raw/master/doc/screenshot-05.png)
 
 ## License
