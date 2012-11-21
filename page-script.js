@@ -68,6 +68,16 @@ $('#serverdetails').bind('pagebeforeshow',function(event, page){
 		$('#serverName').html(srv.desc);
 		if(page.prevPage.attr('id') == "home") {
 			$('#serverData').html('<div style="text-align: center;"><img src="images/ajax-loader.gif" style="margin-top:50px" /><p>Loading data ...</p></div>');
+		}
+	}
+});
+$('#serverdetails').bind('pageshow',function(event, page){
+	if(!servers || !selectedServer) {
+		$.mobile.changePage($("#home"));
+	}
+	else {
+		var srv = servers[selectedServer];
+		if(page.prevPage.attr('id') == "home") {
 			var cacheVar = new Date().getTime();
 			$.ajax({
 				url: 'serverRequest.php?'+cacheVar,
