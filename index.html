@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html manifest="cache.manifest">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
@@ -7,17 +7,15 @@
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 		<meta http-equiv="Pragma" content="no-cache" />
 		<meta http-equiv="Expires" content="-1" />
-		<link rel="apple-touch-icon" href="apple-touch-icon.png" />
-		<link rel="apple-touch-icon" sizes="72x72" href="apple-touch-icon-72x72-precomposed.png" />
-		<link rel="apple-touch-icon" sizes="114x114" href="apple-touch-icon-114x114-precomposed.png" />
-		<link rel="apple-touch-icon" sizes="144x144" href="apple-touch-icon-144x144-precomposed.png" />
+		<link rel="apple-touch-icon" href="ico/apple-touch-icon.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="ico/apple-touch-icon-72x72-precomposed.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="ico/apple-touch-icon-114x114-precomposed.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="ico/apple-touch-icon-144x144-precomposed.png" />
 		<title>MetaGlances</title>
-		<link rel="stylesheet" href="//code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
-		<link rel="stylesheet" href="style.css" />
-		<link rel="stylesheet" href="jqm-icon-pack-2.0-original.css" />
-		<script src="//code.jquery.com/jquery-1.8.2.min.js"></script>
-		<script src="//code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
-		<script src="script.js"></script>
+		<link rel="stylesheet" href="jquery.mobile-1.3.0.min.css" />
+		<link rel="stylesheet" href="metaglances.css" />
+		<script src="jquery-1.9.1.min.js"></script>
+		<script src="jquery.mobile-1.3.0.min.js"></script>
 		<style>	
 			.nav-glyphish-example .ui-btn .ui-btn-inner { padding-top: 30px !important; }
 			.nav-glyphish-example .ui-btn .ui-icon { width: 25px!important; height: 25px!important; margin-left: -15px !important; box-shadow: none!important; -moz-box-shadow: none!important; -webkit-box-shadow: none!important; -webkit-border-radius: 0 !important; border-radius: 0 !important; }
@@ -67,8 +65,8 @@
 			<div data-role="header" data-position="fixed">
 				<h3><span id="serverName">Server Details</span></h3>
 				<a data-role="button" data-rel="back" href="#home" data-icon="arrow-l" data-iconpos="left" class="ui-btn-left">Servers</a>
-<!--				<a data-role="button" data-rel="dialog" href="#ConfirmDeleteDialog" data-icon="delete" data-iconpos="left" class="ui-btn-right" data-theme="f">Delete</a>-->
-				<a data-role="button" data-rel="dialog" href="#ConfirmDeleteDialog" data-icon="delete" data-iconpos="notext" class="ui-btn-right" data-theme="f">Delete</a>
+				<!--<a data-role="button" data-rel="dialog" href="#ConfirmDeleteDialog" data-icon="delete" data-iconpos="notext" class="ui-btn-right" data-theme="f">Delete</a>-->
+				<a data-role="button" data-rel="dialog" href="#panelDetails" data-icon="bars" data-iconpos="notext" class="ui-btn-right">Panel</a>
 			</div>
 			<div data-role="content">
 				<div id="serverData"></div>
@@ -87,6 +85,13 @@
 				<a href="#" data-rel="back" data-role="button" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
 				<p id="msg"><p>
 			</div>
+            <!-- Panel -->
+            <div data-role="panel" id="panelDetails" data-display="overlay" data-theme="a">
+                <ul data-role="listview">
+                    <li data-icon="gear"><a href="#serverform">Change settings</a></li>
+                    <li data-icon="delete" data-theme="f"><a href="#ConfirmDeleteDialog" data-rel="dialog">Delete server</a></li>
+                </ul>
+            </div><!-- /panel -->
 		</div>
 		<!-- ComponentDetails -->
 		<div data-role="page" data-theme="a" id="componentdetails">
@@ -123,27 +128,38 @@
 			</div>
 			<div data-role="content">
 				<div data-role="fieldcontain">
-					<fieldset data-role="controlgroup" data-mini="true">
-						<label for="inputfqdn">Fully Qualified Domain Name</label>
-						<input name="fqdn" id="inputfqdn" placeholder="somehost.example.com" value="" type="text">
-					</fieldset>
+					<label for="inputfqdn">Fully Qualified Domain Name</label>
+					<input name="fqdn" id="inputfqdn" placeholder="somehost.example.com" value="" type="text" data-mini="true" />
 				</div>
 				<div data-role="fieldcontain">
-					<fieldset data-role="controlgroup" data-mini="true">
-						<label for="inputipv4">IPv4 Address</label>
-						<input name="ipv4" id="inputipv4" placeholder="0.0.0.0" value="" type="text">
-					</fieldset>
+					<label for="inputipv4">IPv4 Address</label>
+					<input name="ipv4" id="inputipv4" placeholder="0.0.0.0" value="" type="text" data-mini="true" />
 				</div>
 				<div data-role="fieldcontain">
-					<fieldset data-role="controlgroup" data-mini="true">
-						<label for="inputport">Port number</label>
-						<input name="port" id="inputport" placeholder="" value="61209" type="text">
-					</fieldset>
+					<label for="inputport">Port number</label>
+					<input name="port" id="inputport" placeholder="" value="61209" type="text" data-mini="true" />
 				</div>
 				<div data-role="fieldcontain">
-					<fieldset data-role="controlgroup" data-mini="true">
-						<label for="inputdesc">Description</label>
-						<input name="desc" id="inputdesc" placeholder="(optional)" value="" type="text">
+					<label for="inputdesc">Description</label>
+					<input name="desc" id="inputdesc" placeholder="(optional)" value="" type="text" data-mini="true" />
+				</div>
+				<div data-role="fieldcontain">
+					<label for="inputdesc">Password</label>
+					<input name="pass" id="inputpass" placeholder="(optional)" value="" type="text" data-mini="true" />
+				</div>
+				<div data-role="fieldcontain">
+					<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+						<legend>Refresh interval</legend>
+						<input type="radio" name="refr" id="radio-refr-a" value="1" />
+						<label for="radio-refr-a">1 min</label>
+						<input type="radio" name="refr" id="radio-refr-b" value="2" checked="checked" />
+						<label for="radio-refr-b">2 min</label>
+						<input type="radio" name="refr" id="radio-refr-c" value="3" />
+						<label for="radio-refr-c">3 min</label>
+						<input type="radio" name="refr" id="radio-refr-d" value="4" />
+						<label for="radio-refr-d">4 min</label>
+						<input type="radio" name="refr" id="radio-refr-e" value="5" />
+						<label for="radio-refr-e">5 min</label>
 					</fieldset>
 				</div>
 			</div>
@@ -166,8 +182,7 @@
 		<div data-role="page" data-theme="a" id="cloud">
 			<div data-role="header" data-position="fixed">
 				<h3>Store on Cloud</h3>
-<!--				<a data-role="button" href="" data-icon="power" data-iconpos="left" class="ui-btn-right" data-theme="f" id="signout">Signout</a>-->
-				<a data-role="button" href="" data-icon="power" data-iconpos="notext" class="ui-btn-right" data-theme="f" id="signout">Signout</a>
+				<a data-role="button" href="" data-icon="delete" data-iconpos="notext" class="ui-btn-right" data-theme="f" id="signout">Signout</a>
 			</div>
 			<div data-role="content">
 				<p style="font-size: small;">This is useful in the recovery scenario when you want to get your config back after the failure or if you want to use the same config on another device.</p>
@@ -223,9 +238,18 @@
 					<h2>ChangeLog</h2>
 					<p>
 						<dl>
-							<dt>Build 3 <span style="font-size: small;">(21 Nov. 2012)</span><dt>
+							<dt>Build 5 <span style="font-size: small;">(25 Mar. 2013)</span><dt>
+							<dd>* upd jquery to 1.9.1</dd>
+							<dd>* upd jquery mobile to 1.3.0</dd>
+							<dd>* add server password</dd>
+							<dd>* fix disk and network rate</dd>
+						</dl>
+						<dl>
+							<dt>Build 4 <span style="font-size: small;">(21 Nov. 2012)</span><dt>
 							<dd>* fix some bug</dd>
 							<dd>* add server details</dd>
+							<dd>* add refresh rate param</dd>
+							<dd>* fix disk and network</dd>
 						</dl>
 						<dl>
 							<dt>Build 2 <span style="font-size: small;">(16 Nov. 2012)</span><dt>
@@ -248,7 +272,7 @@
 				</div>
 			</div>
 		</div>
-		<script src="page-script.js"></script>
+		<script src="metaglances-min.js"></script>
 	</body>
 
 </html>

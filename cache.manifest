@@ -1,0 +1,30 @@
+CACHE MANIFEST
+# 2013-03-25:v1
+
+CACHE:
+ico/apple-touch-icon.png
+ico/apple-touch-icon-57x57-precomposed.png
+ico/apple-touch-icon-72x72-precomposed.png
+ico/apple-touch-icon-114x114-precomposed.png
+ico/apple-touch-icon-144x144-precomposed.png
+ico/apple-touch-icon-precomposed.png
+ico/apple-touch-startup-image-320x460.png
+ico/apple-touch-startup-image-768x1004.png
+images/ajax-loader.gif
+images/icons-18-black.png
+images/icons-18-white.png
+images/icons-36-black.png
+images/icons-36-white.png
+images/logo.png
+images/glyphish-icons/12-eye.png
+images/glyphish-icons/14-tag.png
+images/glyphish-icons/56-cloud.png
+index.html
+jquery.mobile-1.3.0.min.css
+jquery.mobile-1.3.0.min.js
+jquery-1.9.1.min.js
+metaglances.css
+metaglances-min.js
+
+NETWORK:
+*
