@@ -38,12 +38,15 @@ $('#home').bind('pageshow',function(event){
 		
 		// Build change (update)
 		if(localStorage.build < build){
-			// THINGS TODO ON UPDATE
-			$.each(servers, function(i,item){
-				if(typeof(item.fqdn)==="undefined") item.fqdn = ''; // (b2+)
-				if(typeof(item.refr)==="undefined") item.refr = '2'; // 2 minutes is the default refresh rate value (b4+)
-			});
-			setStorage('servers', servers);
+            if(servers) {
+                // THINGS TODO ON UPDATE
+                $.each(servers, function(i,item){
+                    if(typeof(item.fqdn)==="undefined") item.fqdn = ''; // (b2+)
+                    if(typeof(item.refr)==="undefined") item.refr = '2'; // 2 minutes is the default refresh rate value (b4+)
+                    if(typeof(item.pass)==="undefined") item.pass = ''; // empty password
+                });
+                setStorage('servers', servers);
+            }
 			// Update build number
 			localStorage.build = build;
 		}
@@ -56,7 +59,7 @@ $('#home').bind('pageshow',function(event){
 			$('#user').hide();
 		}
 
-		if(servers.length){
+		if(servers && servers.length){
 			$('ul#serverList').empty().append('<li data-role="list-divider" role="heading">Server List</li>');
 			$.each(servers, function(i,item){
 				$('ul#serverList').append('<li><a href="#serverdetails" id="srv-'+i+'">'+item.desc+'</a></li>');
@@ -71,6 +74,7 @@ $('#home').bind('pageshow',function(event){
 		$('ul#serverList').listview('refresh');
 	} catch(err){
 		displayPopup('popupNotSupported', 'Sorry! No web storage support...');
+        console.log(err);
 	}
 });
 
@@ -243,10 +247,15 @@ $('#btnRestore').click(function(){
 		data: 'mail='+user.mail+'&pass='+user.pass,
 		type: 'post',
 		contentType: "application/x-www-form-urlencoded",
-		success : function(response, status, jqXHR) {
-			setStorage('servers', eval(response));
-			servers = null; // Force home server list to refresh
-			displayPopup('popupCloud', 'Restore completed ...');
+		success : function(response, status, jqXHR) { 
+            var testJsonFormat = JSON.parse(response);
+            if(typeof testJsonFormat =='object') {
+                localStorage.servers = response;
+                servers = null; // Force home server list to refresh
+                displayPopup('popupCloud', 'Restore completed ...');
+            }
+            else
+                displayPopup('popupCloud', 'Restoration failed !');
 		},
 		error : function (xhr, ajaxOptions, thrownError){
 			displayPopup('popupCloud', 'Restoration failed !');
@@ -258,7 +267,7 @@ $('#btnStore').click(function(){
 	var cacheVar = new Date().getTime();
 	$.ajax({
 		url: 'config.php?'+cacheVar,
-		data: 'mail='+user.mail+'&pass='+user.pass+'&conf='+getStorage('servers'),
+		data: 'mail='+user.mail+'&pass='+user.pass+'&conf='+localStorage.servers,
 		type: 'post',
 		contentType: "application/x-www-form-urlencoded",
 		success : function(response, status, jqXHR) {

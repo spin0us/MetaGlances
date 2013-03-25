@@ -41,9 +41,10 @@ if(isset($_POST['conf'])) {
 else {
 	if(file_exists(CACHE_DIRECTORY.$_POST['mail'])) {
 		$conf = decryptData($token, file_get_contents(CACHE_DIRECTORY.$_POST['mail']));
-		echo trim($conf);
+        $conf = trim($conf);
+		echo empty($conf) ? '[]' : $conf;
 	}
 	else {
-		echo json_encode(array());
+		echo '[]';
 	}
 }
