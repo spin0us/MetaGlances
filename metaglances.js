@@ -4,7 +4,7 @@ var servers = null;
 
 var UCFirst = function(string) { return string.charAt(0).toUpperCase() + string.slice(1); };
 var round = function(fval,dec) { return dec > 0 ? (Math.round(fval * 10 * dec) / (10 * dec)) : Math.round(fval); };
-var getHtmlTag = function(val,care,warn,crit) { return {tag: (val > crit ? 'critical' : (val > warn ? 'warning' : (val > care ? 'careful' : 'span'))), level: (val > crit ? 3 : (val > warn ? 2 : (val > care ? 1 : 0))) }; };
+var getHtmlTag = function(val,ref) { return {tag: (val > ref[2] ? 'critical' : (val > ref[1] ? 'warning' : (val > ref[0] ? 'careful' : 'span'))), level: (val > ref[2] ? 3 : (val > ref[1] ? 2 : (val > ref[0] ? 1 : 0))) }; };
 var bytesToSize = function(bytes, dec) { var sizes = ['B', 'K', 'M', 'G', 'T']; if (bytes == 0) return '0'; var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024))); return round(bytes / Math.pow(1024, i), dec) + sizes[i]; };
 var bitsToSize = function(bits, dec) { var sizes = ['b', 'Kb', 'Mb', 'Gb', 'Tb']; if (bits == 0) return '0'; var i = parseInt(Math.floor(Math.log(bits) / Math.log(1000))); return round(bits / Math.pow(1000, i), dec) + sizes[i]; };
 var displayPopup = function(selector, message) { $('#'+selector+' > p#msg').html(message).trigger('create'); $('#'+selector).popup("open"); };
@@ -295,15 +295,15 @@ var loadLinuxTemplate = function(obj) {
 	// Usage
 	content = '';
 	// Cpu
-	htmlTag = getHtmlTag(100 - obj.cpu.idle,50,70,90);
+	htmlTag = getHtmlTag(100 - obj.cpu.idle,obj.limits.STD);
 	highTag = htmlTag;
 	content += '<li><a href="#componentdetails" onClick="compclk=\'cpu\'"><'+htmlTag.tag+'>CPU <p class="ui-li-aside">'+round(100 - obj.cpu.idle,1)+'%</p></'+htmlTag.tag+'></a></li>';
 	// Ram
-	htmlTag = getHtmlTag(obj.mem.percent,50,70,90);
+	htmlTag = getHtmlTag(obj.mem.percent,obj.limits.MEM);
 	highTag = htmlTag.level > highTag.level ? htmlTag : highTag;
 	content += '<li><a href="#componentdetails" onClick="compclk=\'ram\'"><'+htmlTag.tag+'>RAM <p class="ui-li-aside">'+obj.mem.percent+'%</p></'+htmlTag.tag+'></a></li>';
 	// Swap
-	htmlTag = getHtmlTag(obj.memswap.percent,50,70,90);
+	htmlTag = getHtmlTag(obj.memswap.percent,obj.limits.SWAP);
 	highTag = htmlTag.level > highTag.level ? htmlTag : highTag;
 	content += '<li><a href="#componentdetails" onClick="compclk=\'swap\'"><'+htmlTag.tag+'>SWAP <p class="ui-li-aside">'+obj.memswap.percent+'%</p></'+htmlTag.tag+'></a></li>';
 	esd.append('<p>Usage</p><ul data-role="listview" data-inset="true">'+content+'</ul>');
@@ -311,9 +311,9 @@ var loadLinuxTemplate = function(obj) {
 	// Load
 	content = '';
 	content += '<li>1 minute <p class="ui-li-aside">'+obj.load.min1+'</p></li>';
-	htmlTag = getHtmlTag(obj.load.min5,0.7*obj.core_number,1*obj.core_number,5*obj.core_number);
+	htmlTag = getHtmlTag(obj.load.min5,obj.limits.LOAD);
 	content += '<li><'+htmlTag.tag+'>5 minutes <p class="ui-li-aside">'+obj.load.min5+'</p></'+htmlTag.tag+'></li>';
-	htmlTag = getHtmlTag(obj.load.min15,0.7*obj.core_number,1*obj.core_number,5*obj.core_number);
+	htmlTag = getHtmlTag(obj.load.min15,obj.limits.LOAD);
 	highTag = htmlTag.level > highTag.level ? htmlTag : highTag;
 	content += '<li><'+htmlTag.tag+'>15 minutes <p class="ui-li-aside">'+obj.load.min15+'</p></'+htmlTag.tag+'></li>';
 	esd.append('<p>Load <span class="ui-h3-aside">'+obj.core_number+'-Core</span></p><ul data-role="listview" data-inset="true">'+content+'</ul>');
@@ -340,7 +340,7 @@ var loadLinuxTemplate = function(obj) {
 	content = '';
 	highTag = null;
 	$.each(obj.fs, function(i,item){
-		htmlTag = getHtmlTag(obj.fs.size * 100 - obj.fs.used,50,70,90);
+		htmlTag = getHtmlTag(obj.fs.size * 100 - obj.fs.used,obj.limits.FS);
 		if(!highTag) highTag = htmlTag;
 		highTag = htmlTag.level > highTag.level ? htmlTag : highTag;
 		content += '<li><'+htmlTag.tag+'>'+item.mnt_point+' <p class="ui-li-aside ui-li-aside-fwidth">'+bytesToSize(item.size,1)+'</p><p class="ui-li-aside ui-li-aside-fwidth">'+bytesToSize(item.used,1)+'</'+htmlTag.tag+'></p></li>';
@@ -360,17 +360,17 @@ var loadLinuxCpuTemplate = function(elm) {
 	if(!lobj) return;
 	$.each(lobj.percpu, function(i, cpu){
 		content = '';
-		htmlTag = getHtmlTag(cpu.user,50,70,90);
+		htmlTag = getHtmlTag(cpu.user,lobj.limits.CPU_USER);
 		content += '<li><'+htmlTag.tag+'>User <p class="ui-li-aside">'+round(cpu.user,1)+'%</p></'+htmlTag.tag+'></li>';
-		htmlTag = getHtmlTag(cpu.system,50,70,90);
+		htmlTag = getHtmlTag(cpu.system,lobj.limits.CPU_SYSTEM);
 		content += '<li><'+htmlTag.tag+'>System <p class="ui-li-aside">'+round(cpu.system,1)+'%</p></'+htmlTag.tag+'></li>';
-		htmlTag = getHtmlTag(cpu.nice,50,70,90);
+		htmlTag = getHtmlTag(cpu.nice,lobj.limits.STD);
 		content += '<li><'+htmlTag.tag+'>Nice <p class="ui-li-aside">'+round(cpu.nice,1)+'%</p></'+htmlTag.tag+'></li>';
-		htmlTag = getHtmlTag(cpu.iowait,50,70,90);
+		htmlTag = getHtmlTag(cpu.iowait,lobj.limits.CPU_IOWAIT);
 		content += '<li><'+htmlTag.tag+'>IoWait <p class="ui-li-aside">'+round(cpu.iowait,1)+'%</p></'+htmlTag.tag+'></li>';
-		htmlTag = getHtmlTag(cpu.irq,50,70,90);
+		htmlTag = getHtmlTag(cpu.irq,lobj.limits.STD);
 		content += '<li><'+htmlTag.tag+'>IRQ <p class="ui-li-aside">'+round(cpu.irq,1)+'%</p></'+htmlTag.tag+'></li>';
-		htmlTag = getHtmlTag(100 - cpu.idle,50,70,90);
+		htmlTag = getHtmlTag(100 - cpu.idle,lobj.limits.STD);
 		elm.append('<ul data-role="listview" data-inset="true" data-divider-theme="a"><li data-role="list-divider"><'+htmlTag.tag+'>CPU #'+i+' <p class="ui-li-aside">'+round(100 - cpu.idle,1)+'%</p></'+htmlTag.tag+'></li>'+content+'</ul>');
 	});
 	

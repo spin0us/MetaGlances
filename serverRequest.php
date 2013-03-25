@@ -85,6 +85,16 @@ if(!file_exists(CACHE_DIRECTORY.$serverFileName) || (time() - filemtime(CACHE_DI
 	$xml = simplexml_load_string($output);
 	$json = json_decode($xml->params->param->value->string);
 
+    // Retrieve all limits
+	$getAll = '<?xml version="1.0"?><methodCall><methodName>getAllLimits</methodName></methodCall>';
+	$output = do_post_request('http://'.$ipv4.':'.$port.'/RPC2', $getAll, $authorization_header);
+	$xml = simplexml_load_string($output);
+    $json->limits = json_decode($xml->params->param->value->string);
+    // Update LOAD limits with core number
+    $json->limits->LOAD[0] *= $json->core_number;
+    $json->limits->LOAD[1] *= $json->core_number;
+    $json->limits->LOAD[2] *= $json->core_number;
+
 	// Add glances version in output
 	$json->host->glances = (string)$version;
 	
