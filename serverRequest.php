@@ -16,27 +16,61 @@ ini_set('display_errors', '1');
 define('CACHE_FILE_TTL', 2); // in minute(s)
 define('CACHE_DIRECTORY', './cache/data/'); // server cache directory
 
-function do_post_request($url, $data, $optional_headers = null) {
-	$params = array('http' => array(
-		'method' => 'POST',
-		'content' => $data
-		));
-    
-	if ($optional_headers !== null) {
-		$params['http']['header'] = $optional_headers;
-	}
-	$ctx = stream_context_create($params);
-	$fp = @fopen($url, 'rb', false, $ctx);
-	if (!$fp) {
-        if(isset($php_errormsg) && preg_match("/401/", $php_errormsg)) header("HTTP/1.1 401 Authentication failed");
-        else header("HTTP/1.1 403 Forbidden");
-		die();
-	}
-	$response = @stream_get_contents($fp);
-	if ($response === false) {
-		throw new Exception("Problem reading data from $url, $php_errormsg");
-	}
-	return $response;
+if (!function_exists('do_post_request'))
+{
+    /**
+     * Send a POST request using the more wide method
+     *
+     * @name        do_post_request()
+     * @param       [$url]                  string
+     * @param       [$data]                 string or array
+     * @param       [$optional_headers]     string or array
+     * @return      void
+     */
+    function do_post_request($url, $data, $optional_headers = null)
+    {
+        if (is_array($data))
+        {
+            $in_line = '';
+            foreach ($data as $key => $val)
+            {
+                $in_line .= $key . '=' . $val . '&';
+            }
+            $data = trim($in_line, '&');
+        }
+        $params = array('http' => array(
+            'method' => 'POST',
+            'content' => $data
+            ));
+        if ($optional_headers !== null)
+        {
+            if (is_array($optional_headers))
+            {
+                $in_line = '';
+                foreach ($optional_headers as $key => $val)
+                {
+                    $in_line .= $key . ': ' . $val . "\r\n";
+                }
+                $optional_headers = trim($in_line);
+            }
+            $params['http']['header'] = $optional_headers;
+        }
+        $ctx = stream_context_create($params);
+        $stream = @fopen($url, 'rb', false, $ctx);
+        if (!$stream)
+        {
+            if(isset($php_errormsg) && preg_match("/401/", $php_errormsg)) header("HTTP/1.1 401 Authentication failed");
+            else header("HTTP/1.1 403 Forbidden");
+            die();
+        }
+        $response = @stream_get_contents($stream);
+        fclose($stream);
+        if ($response === false || empty($response))
+        {
+            throw new Exception("Problem reading data from $url");
+        }
+        return $response;
+    }
 }
 
 // Check POST params
@@ -98,7 +132,7 @@ if(!file_exists(CACHE_DIRECTORY.$serverFileName) || (time() - filemtime(CACHE_DI
 	// Add glances version in output
 	$json->host->glances = (string)$version;
 	
-	$json->lastupdate = date("d M y H:i:s");
+	$json->lastupdate = gmdate("d M y H:i:s");
 	$json->ts = time();
 
 	// Store in cache
