@@ -7,6 +7,8 @@
  * CreationDate : 17:21 16/11/2012
  ******************************************************************/
 
+$authorized_users = array('user@domain.dsn', 'another@one.dsn');
+ 
 define('CACHE_DIRECTORY', './cache/config/'); // server cache directory
 
 function encryptData($key, $data) {
@@ -27,6 +29,12 @@ function decryptData($key, $data) {
 if( !isset($_POST['mail']) || !isset($_POST['pass']) ) {
 	header("HTTP/1.1 400 Bad Request");
 	die();
+}
+
+// Check if user if authorized
+if(!in_array($_POST['mail'], $authorized_users)) {
+    header("HTTP/1.1 403 Forbidden");
+    die();
 }
 
 // Check token

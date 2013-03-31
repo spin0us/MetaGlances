@@ -84,7 +84,8 @@ if( (empty($_POST['ipv4']) && empty($_POST['fqdn'])) || empty($_POST['port']) ) 
 }
 
 // Refresh rate
-$refresh_rate = (isset($_POST['refr']) && in_array($_POST['refr'],array(1,2,3,4,5)) ? $_POST['refr'] : CACHE_FILE_TTL) * 60;
+// $refresh_rate = (isset($_POST['refr']) && in_array($_POST['refr'],array(1,2,3,4,5)) ? $_POST['refr'] : CACHE_FILE_TTL) * 60;
+$refresh_rate = 5 * 60;
 
 // Clean cached old files
 $files = scandir(CACHE_DIRECTORY);

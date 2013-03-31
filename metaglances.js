@@ -80,7 +80,7 @@ $('#home').bind('pageshow',function(event){
 
 // ServerDetails
 $('#serverdetails').bind('pagebeforeshow',function(event, page){
-	if(!servers || !selectedServer) {
+	if(!servers || !selected || getStorage('config') === null) {
 		$.mobile.changePage($("#home"));
 	}
 	else {
@@ -145,7 +145,7 @@ $('#componentdetails').bind('pagebeforeshow',function(event, page){
 
 // ServerForm
 $('#serverform').bind('pagebeforeshow',function(event, data){
-	if(!servers) {
+	if(!servers || getStorage('config') === null) {
 		$.mobile.changePage($("#home"));
 	}
     if(data.prevPage.attr('id') === 'serverdetails') {
