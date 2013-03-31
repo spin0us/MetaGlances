@@ -80,7 +80,7 @@ $('#home').bind('pageshow',function(event){
 
 // ServerDetails
 $('#serverdetails').bind('pagebeforeshow',function(event, page){
-	if(!servers || !selected || getStorage('config') === null) {
+	if(!servers || !selectedServer || getStorage('config') === null) {
 		$.mobile.changePage($("#home"));
 	}
 	else {
