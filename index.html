@@ -190,9 +190,9 @@
 					</fieldset>
 				</div>
 				<div id="registered">
-					<a href="" data-role="button" id="btnRestore">Restore configuration</a>
+					<a href="#" data-role="button" id="btnRestore">Restore configuration</a>
 					<p>This will erase your current configuration on this device.</p>
-					<a href="" data-role="button" id="btnStore">Backup configuration</a>
+					<a href="#" data-role="button" id="btnStore">Backup configuration</a>
 					<p>This will erase your current configuration on the cloud.</p>
 				</div>
 			</div>
@@ -210,6 +210,15 @@
 				<a href="#" data-rel="back" data-role="button" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
 				<p id="msg"><p>
 			</div>
+            <!-- Dialog -->
+            <div data-role="popup" id="dialogCloud" data-theme="a" data-dismissible="false" class="ui-corner-all">
+                <div data-role="content" class="ui-corner-bottom ui-content">
+                    <h3 class="ui-title">Do you want to restore your configuration ?</h3>
+                    <p>This will erase your current configuration on this device.</p>
+                    <a href="#" data-role="button" data-inline="true" data-rel="back">No, thanks</a>
+                    <a href="#" id="btnConfirmRestore" data-role="button" data-inline="true" data-rel="back" data-theme="f">Yes</a>
+                </div>
+            </div>
 		</div>
 		<!-- About -->
 		<div data-role="page" data-theme="a" id="about">
@@ -226,7 +235,7 @@
 						<li><critical>RED</critical>: stat counter is "CRITICAL"</li>
 					</ul>
 					<h2>License</h2>
-					<p>Copyright &copy; 2012 Laurent Spinelli (aka Spin0us)</p>
+					<p>Copyright &copy; 2013 Laurent Spinelli (aka Spin0us)</p>
 					<p><code>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</code></p>
 					<p><code>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.</code></p>
 					<p><code>You should have received a copy of the GNU General Public License along with this program. If not, see <a href="//www.gnu.org/licenses/">www.gnu.org/licenses/</a>.</code></p>

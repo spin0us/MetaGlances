@@ -233,6 +233,7 @@ $('#btnRegister').click(function(){
 	$('#signout').toggle();
 	$('#guest').toggle();
 	$('#registered').toggle();
+    $('#dialogCloud').popup("open");
 });
 $('#signout').click(function(){
 	delStorage('config');
@@ -241,6 +242,9 @@ $('#signout').click(function(){
 	$('#registered').toggle();
 	$('#fldMail').val('');
 	$('#fldPass').val('');
+});
+$('#btnConfirmRestore').click(function(){
+    $('#btnRestore').click();
 });
 $('#btnRestore').click(function(){
 	var user = getStorage('config');
