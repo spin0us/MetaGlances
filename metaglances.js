@@ -1,4 +1,4 @@
-var build = "5";
+var build = "6";
 var selectedServer, lobj, compclk;
 var servers = null;
 
@@ -41,7 +41,14 @@ $('#home').bind('pageshow',function(event){
             if(servers) {
                 // THINGS TODO ON UPDATE
                 $.each(servers, function(i,item){
-                    if(typeof(item.fqdn)==="undefined") item.fqdn = ''; // (b2+)
+                    if(typeof(item.ipv4)!=="undefined") { // b6+
+                        item.name = item.ipv4;
+                        delete item.ipv4;
+                    }
+                    if(typeof(item.fqdn)!=="undefined") { // b6+
+                        if(typeof(item.name)==="undefined") item.name = item.fqdn;
+                        delete item.fqdn;
+                    }
                     if(typeof(item.refr)==="undefined") item.refr = '2'; // 2 minutes is the default refresh rate value (b4+)
                     if(typeof(item.pass)==="undefined") item.pass = ''; // empty password
                 });
@@ -101,7 +108,7 @@ $('#serverdetails').bind('pageshow',function(event, page){
 			var cacheVar = new Date().getTime();
             $.ajax({
 				url: 'serverRequest.php?'+cacheVar,
-				data: 'fqdn='+srv.fqdn+'&ipv4='+srv.ipv4+'&port='+srv.port+'&refr='+srv.refr+'&pass='+srv.pass,
+				data: 'name='+srv.name+'&port='+srv.port+'&refr='+srv.refr+'&pass='+srv.pass,
 				type: 'post',
 				contentType: "application/x-www-form-urlencoded",
 				success : function(response, status, jqXHR) {
@@ -151,16 +158,14 @@ $('#serverform').bind('pagebeforeshow',function(event, data){
     if(data.prevPage.attr('id') === 'serverdetails') {
         // Change settings of an existing server
         var srv = servers[selectedServer];
-        $('input[name="fqdn"]').val(srv.fqdn);
-        $('input[name="ipv4"]').val(srv.ipv4);
+        $('input[name="name"]').val(srv.name);
         $('input[name="desc"]').val(srv.desc);
         $('input[name="pass"]').val(srv.pass);
         $('input[name="refr"]:radio[value="'+srv.refr+'"]').click();
     }
     else {
         // Reinit input values
-        $('input[name="fqdn"]').val('');
-        $('input[name="ipv4"]').val('');
+        $('input[name="name"]').val('');
         $('input[name="desc"]').val('');
         $('input[name="pass"]').val('');
         $('input[name="refr"]:radio[value="2"]').click();
@@ -172,15 +177,14 @@ $('#formSave').bind('click', function(event, ui) {
 	var ipv4Pattern = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}?(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 	var portPattern = /^[0-9]{2,5}$/;
 	// Retrieve input values
-	var fqdn_val = $('input[name="fqdn"]').val();
-	var ipv4_val = $('input[name="ipv4"]').val();
+	var name_val = $('input[name="name"]').val();
 	var port_val = $('input[name="port"]').val();
 	var desc_val = $('input[name="desc"]').val();
 	var pass_val = $('input[name="pass"]').val();
 	var refr_val = $('input:radio[name="refr"]:checked').val();
-	if(desc_val == '') desc_val = (fqdn_val == '' ? ipv4_val : fqdn_val);
+	if(desc_val == '') desc_val = name_val;
 	// Test values with patterns
-	if((fqdnPattern.test(fqdn_val) || ipv4Pattern.test(ipv4_val)) && portPattern.test(port_val)){
+	if((fqdnPattern.test(name_val) || ipv4Pattern.test(name_val)) && portPattern.test(port_val)){
         // Change settings of an existing server
         if(selectedServer) {
             servers.splice(selectedServer,1);
@@ -189,12 +193,11 @@ $('#formSave').bind('click', function(event, ui) {
 		// Check if server not already in collection
 		var alreadyExists = false;
 		$.each(servers, function(i,item){
-			if(item.fqdn != "" && item.fqdn == fqdn_val) alreadyExists = true;
-			if(item.ipv4 != "" && item.ipv4 == ipv4_val) alreadyExists = true;
+			if(item.name == name_val) alreadyExists = true;
 		});
 		// Store the new server
 		if(!alreadyExists){
-			servers.push({fqdn:fqdn_val,ipv4:ipv4_val,port:port_val,desc:desc_val,pass:pass_val,refr:refr_val});
+			servers.push({name:name_val,port:port_val,desc:desc_val,pass:pass_val,refr:refr_val});
 			servers.sort(function(a,b) {return (a.desc > b.desc) ? 1 : ((b.desc > a.desc) ? -1 : 0);});
 			setStorage('servers', servers);
 			servers = null; // Force home server list to refresh

@@ -65,7 +65,6 @@
 			<div data-role="header" data-position="fixed">
 				<h3><span id="serverName">Server Details</span></h3>
 				<a data-role="button" data-rel="back" href="#home" data-icon="arrow-l" data-iconpos="left" class="ui-btn-left">Servers</a>
-				<!--<a data-role="button" data-rel="dialog" href="#ConfirmDeleteDialog" data-icon="delete" data-iconpos="notext" class="ui-btn-right" data-theme="f">Delete</a>-->
 				<a data-role="button" data-rel="dialog" href="#panelDetails" data-icon="bars" data-iconpos="notext" class="ui-btn-right">Panel</a>
 			</div>
 			<div data-role="content">
@@ -128,12 +127,8 @@
 			</div>
 			<div data-role="content">
 				<div data-role="fieldcontain">
-					<label for="inputfqdn">Fully Qualified Domain Name</label>
-					<input name="fqdn" id="inputfqdn" placeholder="somehost.example.com" value="" type="text" data-mini="true" />
-				</div>
-				<div data-role="fieldcontain">
-					<label for="inputipv4">IPv4 Address</label>
-					<input name="ipv4" id="inputipv4" placeholder="0.0.0.0" value="" type="text" data-mini="true" />
+					<label for="inputname">FQDN or IPv4</label>
+					<input name="name" id="inputname" placeholder="somehost.example.com or 0.0.0.0" value="" type="text" data-mini="true" />
 				</div>
 				<div data-role="fieldcontain">
 					<label for="inputport">Port number</label>
@@ -237,6 +232,10 @@
 					<p><code>You should have received a copy of the GNU General Public License along with this program. If not, see <a href="//www.gnu.org/licenses/">www.gnu.org/licenses/</a>.</code></p>
 					<h2>ChangeLog</h2>
 					<p>
+						<dl>
+							<dt>Build 6 <span style="font-size: small;">(04 Apr. 2013)</span><dt>
+							<dd>* fix merged fqdn and ipv4</dd>
+						</dl>
 						<dl>
 							<dt>Build 5 <span style="font-size: small;">(25 Mar. 2013)</span><dt>
 							<dd>* upd jquery to 1.9.1</dd>

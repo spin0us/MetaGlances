@@ -74,11 +74,11 @@ if (!function_exists('do_post_request'))
 }
 
 // Check POST params
-if( (!isset($_POST['ipv4']) && !isset($_POST['fqdn'])) || !isset($_POST['port']) ) {
+if( !isset($_POST['name']) || !isset($_POST['port']) ) {
 	header("HTTP/1.1 400 Bad Request");
 	die();
 }
-if( (empty($_POST['ipv4']) && empty($_POST['fqdn'])) || empty($_POST['port']) ) {
+if( empty($_POST['name']) || empty($_POST['port']) ) {
 	header("HTTP/1.1 400 Bad Request");
 	die();
 }
@@ -99,9 +99,9 @@ foreach($files as $file) {
 $token = isset($_POST['token']) ? $_POST['token'] : md5('metaglances');
 
 // Build server file name
-$ipv4 = empty($_POST['ipv4']) ? gethostbyname($_POST['fqdn']) : $_POST['ipv4'];
+$serv = $_POST['name'];
 $port = $_POST['port'];
-$serverFileName = md5($ipv4.$port);
+$serverFileName = md5($serv.$port);
 
 // Check cache
 if(!file_exists(CACHE_DIRECTORY.$serverFileName) || (time() - filemtime(CACHE_DIRECTORY.$serverFileName)) > $refresh_rate)
@@ -110,19 +110,19 @@ if(!file_exists(CACHE_DIRECTORY.$serverFileName) || (time() - filemtime(CACHE_DI
 
 	// Retrieve Glances version
 	$init = '<?xml version="1.0"?><methodCall><methodName>init</methodName></methodCall>';
-	$output = do_post_request('http://'.$ipv4.':'.$port.'/RPC2', $init, $authorization_header);
+	$output = do_post_request('http://'.$serv.':'.$port.'/RPC2', $init, $authorization_header);
 	$xml = simplexml_load_string($output);
 	$version = $xml->params->param->value->string;
 
 	// Retrieve all data
 	$getAll = '<?xml version="1.0"?><methodCall><methodName>getAll</methodName></methodCall>';
-	$output = do_post_request('http://'.$ipv4.':'.$port.'/RPC2', $getAll, $authorization_header);
+	$output = do_post_request('http://'.$serv.':'.$port.'/RPC2', $getAll, $authorization_header);
 	$xml = simplexml_load_string($output);
 	$json = json_decode($xml->params->param->value->string);
 
     // Retrieve all limits
 	$getAll = '<?xml version="1.0"?><methodCall><methodName>getAllLimits</methodName></methodCall>';
-	$output = do_post_request('http://'.$ipv4.':'.$port.'/RPC2', $getAll, $authorization_header);
+	$output = do_post_request('http://'.$serv.':'.$port.'/RPC2', $getAll, $authorization_header);
 	$xml = simplexml_load_string($output);
     $json->limits = json_decode($xml->params->param->value->string);
     // Update LOAD limits with core number
